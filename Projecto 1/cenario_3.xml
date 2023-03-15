@@ -444,15 +444,15 @@
    <address>0</address>
    <protocol>PRIORITY_INHERITANCE_PROTOCOL</protocol>
    <critical_sections>
-    <task_name>BC_DIST</task_name>
-    <critical_section>
-     <task_begin>1</task_begin>
-     <task_end>35</task_end>
-    </critical_section>
     <task_name>MET</task_name>
     <critical_section>
-     <task_begin>1</task_begin>
-     <task_end>45</task_end>
+     <task_begin>15</task_begin>
+     <task_end>40</task_end>
+    </critical_section>
+    <task_name>BC_DIST</task_name>
+    <critical_section>
+     <task_begin>15</task_begin>
+     <task_end>35</task_end>
     </critical_section>
    </critical_sections>
    <cpu_name>RAD6000</cpu_name>
@@ -460,30 +460,6 @@
    <priority>0</priority>
    <priority_assignment>AUTOMATIC_ASSIGNMENT</priority_assignment>
   </pip_resource>
-  <np_resource id="id_60">
-   <object_type>RESOURCE_OBJECT_TYPE</object_type>
-   <name>VME</name>
-   <state>1</state>
-   <size>0</size>
-   <address>0</address>
-   <protocol>NO_PROTOCOL</protocol>
-   <critical_sections>
-    <task_name>CAM</task_name>
-    <critical_section>
-     <task_begin>1</task_begin>
-     <task_end>35</task_end>
-    </critical_section>
-    <task_name>COMM</task_name>
-    <critical_section>
-     <task_begin>1</task_begin>
-     <task_end>35</task_end>
-    </critical_section>
-   </critical_sections>
-   <cpu_name>RAD6000</cpu_name>
-   <address_space_name>AddressSpace</address_space_name>
-   <priority>0</priority>
-   <priority_assignment>AUTOMATIC_ASSIGNMENT</priority_assignment>
-  </np_resource>
  </resources>
 </cheddar>
 
