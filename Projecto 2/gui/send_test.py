@@ -17,3 +17,4 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         heat = random.random() * 50
         message = f"{tempo};{temp_in};{temp_out};{fan};{heat};{state}\n"
         s.sendall(bytes(message, 'ascii'))
+        time.sleep(2)

@@ -18,7 +18,14 @@ class Plot():
 
     def __init__(self) -> None:
         self.window = layout.create_window()
-        self.my_thread = thread.ThreadClass(self.window)
+        # Add the plot to the window
+        in_temp_fig_canvas = self.update_figure(self.window["-INT_TEMP_PLOT-"].TKCanvas)
+        out_temp_fig_canvas = self.update_figure(self.window["-OUT_TEMP_PLOT-"].TKCanvas)
+        heat_fig_canvas = self.update_figure(self.window["-RES_PLOT-"].TKCanvas)
+        fan_fig_canvas = self.update_figure(self.window["-FAN_PLOT-"].TKCanvas)
+        fig_canvas = (in_temp_fig_canvas, out_temp_fig_canvas, heat_fig_canvas, fan_fig_canvas)
+        #initialize thread
+        self.my_thread = thread.ThreadClass(self.window, fig_canvas)
         self.my_thread.start()
         #self.soc = self.create_socket(HOST, PORT)
 
@@ -30,7 +37,8 @@ class Plot():
     def update_figure(self, canvas):
         fig:plt.Figure = plt.Figure(figsize=(5, 4), dpi=100)
         t = np.arange(0, 3, .01)
-        fig.add_subplot(111).plot(t, 2 * np.sin(2 * np.pi * t))
+        ax = fig.add_subplot(111)
+        ax.plot(t, 2 * np.sin(2 * np.pi * t))
 
         matplotlib.use("TkAgg")
         figure_canvas_agg = FigureCanvasTkAgg(fig, canvas)

@@ -3,6 +3,7 @@ import sys
 import os
 import datetime
 import signal
+from time import sleep
 
 HOST = ''
 PORT = 4444
@@ -25,8 +26,10 @@ def data_acquisition(conn: socket):
     
     with open("./data/" + filename + ".csv", "w") as inp:
         inp.write(f"time,temp_in,temp_out,fan,heat,state\n")
-        with conn:
-            while True:
+
+    with conn:
+         while True:
+            with open("./data/" + filename + ".csv", "a") as inp:
                 message = str(conn.recv(1024), 'ascii')
                 buffer += message
                 data = buffer.split("\n")
@@ -40,6 +43,7 @@ def data_acquisition(conn: socket):
                     except Exception as err:
                         print(err)
                         sys.exit(1)
+            sleep(2)
             
 
 def main():
