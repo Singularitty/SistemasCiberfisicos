@@ -2,8 +2,8 @@ import socket
 import random
 import time
 
-HOST = "192.168.1.210"  # The server's hostname or IP address
-PORT = 5554 # The port used by the server
+HOST = "192.168.238.49"  # The server's hostname or IP address
+PORT = 5555 # The port used by the server
 
 def connect_to_server():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,6 +13,7 @@ def connect_to_server():
 while True:
     with connect_to_server() as s:
         try:
+            print("connected")
             time.sleep(0.1)
             tempo = time.time()
             temp_in = random.randint(-100, 100) + random.random()
@@ -21,6 +22,7 @@ while True:
             fan = random.random() * 100
             heat = random.random() * 50
             message = f"{state}\n"
+            print("sending data")
             s.sendall(bytes(message, 'ascii'))
             time.sleep(5)
         except socket.error as e:
