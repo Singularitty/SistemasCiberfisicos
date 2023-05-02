@@ -4,13 +4,15 @@ import time
 import machine
 import onewire
 import ds18x20
+import _thread
+from control_server import *
 
-ssid = "Quinta-dos-Sonhos"
-password = "casadosazeites132"
+ssid = ""
+password = ""
 
-CLIENT_PORT = 5555
-SERVER_PORT = 4444
+PC_SERVER_PORT = 4444
 
+mutex = _thread.allocate_lock()
 
 def connect():
     
@@ -32,7 +34,7 @@ def acquire_data():
     
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("connecting to server")
-    s.connect(('192.168.1.201',SERVER_PORT))
+    s.connect(('192.168.1.201',PC_SERVER_PORT))
     
     while True:
       ds.convert_temp()
@@ -49,7 +51,11 @@ def send_data(s, data):
     
 def main():
     ip = connect()
-    acquire_data()
+    time.sleep(2)
+    _thread.start_new_thread(thread1, ([ip]))
+    #acquire_data()
+    while True:
+        time.sleep(1)
     
 main()
     
