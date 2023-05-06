@@ -1,0 +1,5 @@
+comprimento: 32cm
+largura: 23cm
+altura: 23.5cm
+
+volume = 17,296 dm^3
