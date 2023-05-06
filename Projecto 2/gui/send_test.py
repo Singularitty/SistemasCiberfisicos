@@ -3,7 +3,7 @@ import random
 import time
 
 HOST = "192.168.238.49"  # The server's hostname or IP address
-PORT = 5555 # The port used by the server
+PORT = 3333 # The port used by the server
 
 def connect_to_server():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -21,10 +21,10 @@ while True:
             state = random.randint(0, 5)
             fan = random.random() * 100
             heat = random.random() * 50
-            message = f"{state}\n"
+            message = f"{time.time()};{temp_out}\n"
             print("sending data")
             s.sendall(bytes(message, 'ascii'))
-            time.sleep(5)
+            time.sleep(1)
         except socket.error as e:
             print(f"Socket error: {e}, reconnecting...")
             time.sleep(1)
