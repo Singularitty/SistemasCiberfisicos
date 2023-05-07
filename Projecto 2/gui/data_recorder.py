@@ -6,7 +6,7 @@ import signal
 from time import sleep
 
 HOST = ''
-PORT = 4444
+PORT = 4443
 
 
 def interrupt_handler(signal, frame):

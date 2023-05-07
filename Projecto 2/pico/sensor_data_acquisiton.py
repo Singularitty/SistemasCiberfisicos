@@ -12,7 +12,7 @@ import errno
 EXTERNAL_TEMP_PORT = 3333
 
 # Define Pin where Internal Temperature sensor is connected
-INTERNAL_SENSOR_PIN = machine.Pin(14, machine.Pin.OUT)
+INTERNAL_SENSOR_PIN = machine.Pin(16, machine.Pin.OUT)
 
 
 def open_socket(ip, port):
@@ -48,8 +48,7 @@ def acquire_interal_temperature(ds, roms):
         temp = ds.read_temp(rom)
         return time.time(), temp
 
-def sensor_data_acquisition(ip, shared_mem, mutex):
-
+def initiate(ip):
     # Setup Internal Temperature Probe
     internal_probe = ds18x20.DS18X20(onewire.OneWire(INTERNAL_SENSOR_PIN))
     roms = internal_probe.scan()
@@ -57,20 +56,21 @@ def sensor_data_acquisition(ip, shared_mem, mutex):
     # Open socket to receive external temperature readings
     connection = open_socket(ip, EXTERNAL_TEMP_PORT)
     
-    while True:
-        # Check for data from the EXTERN_TEMP_PORT
-        readable, _, _  = select.select([connection], [], [], 0)
+    return connection
+
+def sensor_data_acquisition(shared_mem, mutex):
+
+    # Check for data from the EXTERN_TEMP_PORT
+    readable, _, _  = select.select([connection], [], [], 0)
         
-        # Attempt to Acquire External Temperature Reading
-        current_external_reading = None
-        for sock in readable:
-            if sock is connection:
-                current_external_reading = acquire_external_temperature(connection)
+    # Attempt to Acquire External Temperature Reading
+    current_external_reading = None
+    for sock in readable:
+        if sock is connection:
+            current_external_reading = acquire_external_temperature(connection)
         
-        # Acquire Internal Temperature Reading
-        current_internal_reading = acquire_interal_temperature(internal_probe, roms)
+    # Acquire Internal Temperature Reading
+    current_internal_reading = acquire_interal_temperature(internal_probe, roms)
         
-        print(current_external_reading)
-        print(current_internal_reading)
-        
-        time.sleep_ms(1000)
+    print(current_external_reading)
+    print(current_internal_reading)

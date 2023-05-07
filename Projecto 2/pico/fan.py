@@ -3,7 +3,7 @@ import time
 import ds18x20
 import onewire
 
-pin13 = machine.Pin(14, machine.Pin.OUT)
+pin13 = machine.Pin(15, machine.Pin.OUT)
 #pin15 = machine.Pin(15, machine.Pin.OUT)
 #rcent = 0
 #while True:

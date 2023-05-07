@@ -3,12 +3,17 @@ import socket
 import select
 import time
 import errno
+import _thread
+from sensor_data_acquisition import sensor_data_acquisition, initiate
 
-DATA_RECORDER_PORT = 4444
-CONFIGURATOR_PORT = 5555
+DATA_RECORDER_PORT = 4443
+CONFIGURATOR_PORT = 5554
 
-ssid = "pico-test"
-password = "passwordrandom132"
+ssid = "Quinta-dos-Sonhos"
+password = "casadosazeites132"
+
+
+mutex = _thread.allocate_lock()
 
 def connect():
     wlan = network.WLAN(network.STA_IF)
@@ -27,7 +32,7 @@ def open_socket(ip, port):
     connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     connection.bind(address)
     connection.listen(1)
-    #connection.setblocking(False)  # Set the socket to non-blocking mode
+    connection.setblocking(False)  # Set the socket to non-blocking mode
     return connection
 
 def receive_state(connection):
@@ -61,13 +66,19 @@ def send_data(s, data):
 
 def main():
     ip = connect()
+
+    external_connection, internal_probe, roms = initiate(ip)
+
     connection = open_socket(ip, CONFIGURATOR_PORT)
     state = 0
 
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(('192.168.238.169', DATA_RECORDER_PORT))
+    s.connect(('192.168.1.201', DATA_RECORDER_PORT))
 
     while True:
+        
+        sensor_data_acquisition(external_connection, internal_probe, roms)
+        
         # Check for data from the CONFIGURATOR_PORT
         readable, _, _ = select.select([connection], [], [], 0)
 
@@ -75,8 +86,8 @@ def main():
             if sock is connection:
                 receive_state(connection)
 
-        for i in range(10):
-            send_data(s, 23)
-            time.sleep_ms(500)
+        
+        send_data(s, 23)
+        time.sleep_ms(1000)
 
 main()

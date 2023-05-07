@@ -2,7 +2,7 @@ import socket
 import random
 import time
 
-HOST = "192.168.238.49"  # The server's hostname or IP address
+HOST = "192.168.1.210"  # The server's hostname or IP address
 PORT = 3333 # The port used by the server
 
 def connect_to_server():
