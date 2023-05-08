@@ -6,8 +6,8 @@ import errno
 import _thread
 from sensor_data_acquisition import sensor_data_acquisition, initiate
 
-DATA_RECORDER_PORT = 4443
-CONFIGURATOR_PORT = 5554
+DATA_RECORDER_PORT = 4444
+CONFIGURATOR_PORT = 5555
 
 ssid = "Quinta-dos-Sonhos"
 password = "casadosazeites132"
