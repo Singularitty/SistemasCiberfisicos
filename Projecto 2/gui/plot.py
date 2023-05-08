@@ -1,4 +1,5 @@
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib import axes
 import matplotlib
 import matplotlib.pyplot as plt
 import PySimpleGUI as sg
@@ -33,15 +34,15 @@ class Plot():
         soc.connect((HOST, PORT))
         return soc
     
-    def create_temps_figure(self, canvas):
+    def create_temps_figure(self, canvas) -> FigureCanvasTkAgg:
         fig:plt.Figure = plt.Figure(figsize=(5, 4), dpi=100)
         t = np.arange(0, 3, .01)
-        ax = fig.add_subplot(111)
-        ax.plot(t, 2 * np.sin(2 * np.pi * t), label="in_temp")
-        ax.plot(t, 2 * np.sin(2 * np.pi * t)*4, label="out_temp")
+        ax:axes.Axes = fig.add_subplot(111)
+        ax.plot(t, 2 * np.sin(2 * np.pi * t), label='in_temp')
+        ax.plot(t, 2 * np.sin(2 * np.pi * t)*4, label='out_temp')
         ax.axhline(y=0.5, color='r', linestyle='-')
         ax.axhline(y=-0.6, color='r', linestyle='-')
-
+        ax.legend()
 
         matplotlib.use("TkAgg")
         figure_canvas_agg = FigureCanvasTkAgg(fig, canvas)
