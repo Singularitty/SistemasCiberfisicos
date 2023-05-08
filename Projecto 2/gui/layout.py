@@ -19,14 +19,9 @@ def create_window() -> sg.Window:
         ]
     ]
 
-    in_temperature_layout = [
-        [sg.Text("Interior Temperature plot")],
-        [sg.Canvas(key="-INT_TEMP_PLOT-")]
-    ]
-
-    out_temperature_layout = [
-        [sg.Text("Exterior Temperature plot")],
-        [sg.Canvas(key="-OUT_TEMP_PLOT-")]
+    temperature_layout = [
+        [sg.Text("Temperature plot")],
+        [sg.Canvas(key="-TEMP_PLOT-")]
     ]
 
     resistance_layout = [
@@ -42,8 +37,7 @@ def create_window() -> sg.Window:
     full_layout = [
         [
             sg.Column(state),
-            sg.Column(in_temperature_layout),
-            sg.Column(out_temperature_layout),
+            sg.Column(temperature_layout),
         ],[
             sg.Column(resistance_layout),
             sg.Column(fan_layout),

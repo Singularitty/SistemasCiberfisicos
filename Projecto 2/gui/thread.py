@@ -32,13 +32,12 @@ class ThreadClass(threading.Thread):
         # apply filename path
         filepath:str = "./data/" + filename + ".csv"
         
-        (in_temp_fig_canva, out_temp_fig_canva, heat_fig_canva, fan_fig_canva) = self.fig_canvas
+        (temp_fig_canva, heat_fig_canva, fan_fig_canva) = self.fig_canvas
         
         while not self.is_killed:
             # create dataframe
             dataframe:pd.DataFrame = pd.read_csv(filepath) 
-            in_temp_fig_canva = self.update_figure(self.window["-INT_TEMP_PLOT-"].TKCanvas, dataframe, "temp_in", in_temp_fig_canva)
-            out_temp_fig_canva = self.update_figure(self.window["-OUT_TEMP_PLOT-"].TKCanvas, dataframe, "temp_out", out_temp_fig_canva)
+            temp_fig_canva = self.update_figure(dataframe, "temp_in", temp_fig_canva)
             heat_fig_canva = self.update_figure(self.window["-RES_PLOT-"].TKCanvas, dataframe, "fan", heat_fig_canva)
             fan_fig_canva = self.update_figure(self.window["-FAN_PLOT-"].TKCanvas, dataframe, "heat", fan_fig_canva)
             sleep(2)
@@ -63,8 +62,20 @@ class ThreadClass(threading.Thread):
     def kill(self) -> None:
         self.is_killed = True
 
-    def update_figure(self, canvas, dataframe:pd.DataFrame, y_value:str, fig_canva:FigureCanvasTkAgg):
+    def update_temps_figure(self, dataframe:pd.DataFrame, in_temp_string:str, out_temp_string:str, fig_canva:FigureCanvasTkAgg):
+        """
+            Updates the figure Canvas of temperatures 
+        """
         fig:plt.Figure = plt.Figure(figsize=(5, 4), dpi=100)
+        fig.add_subplot(111).plot(dataframe.loc[:, "time"], dataframe.loc[:, in_temp_string], dataframe[:, "time"], dataframe.loc[:, out_temp_string])
+        fig_canva.figure = fig
+        fig_canva.draw()
+        fig_canva.get_tk_widget().pack(side="top", fill="both", expand=1)
+        return fig_canva
+
+
+    def update_figure(self, canvas, dataframe:pd.DataFrame, y_value:str, fig_canva:FigureCanvasTkAgg):
+        fig:plt.Figure = plt.Figure(figsize=(3, 3), dpi=100)
         fig.add_subplot(111).plot(dataframe.loc[:, "time"], dataframe.loc[:, y_value])
         fig_canva.figure = fig
         fig_canva.draw()
