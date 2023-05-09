@@ -15,8 +15,13 @@ class Actuation:
         self.heating_max = heating_freq
         self.fan_max = fan_freq
         
+        # Actuation state in percentage
         self.fan_state = 0
         self.heat_state = 0
+        
+        # Actual Duty value
+        self._fan_duty = 0
+        self._heat_duty = 0
 
         # Make sure components are off when initializing actuation component
         self.fan_off()
@@ -53,14 +58,17 @@ class Actuation:
         """
         target = percentage * 10
         self.heating.duty_u16(target)
-        self.heat_state = target
+        self.heat_state = percentage
+        self._heat_duty = target
     
-    def fan_set(self, target):
+    def fan_set(self, percentage):
         """
         Set the heating element to the specified target (unsigned 16 bit int)
         """
+        target = 57500 + percentage * 25 # range de 57500-60000
         self.fan.duty_u16(target)
-        self.fan_state = target
+        self.fan_state = percentage
+        self._fan_duty = target
         
     def get_state(self):
         """

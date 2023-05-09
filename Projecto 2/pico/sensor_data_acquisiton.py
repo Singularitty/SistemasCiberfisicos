@@ -17,7 +17,7 @@ def acquire_temperature(ds, roms):
         temp = ds.read_temp(rom)
         return temp
 
-def initiate():
+def initiate_sensors():
     # Setup Internal Temperature Probe
     internal_probe = ds18x20.DS18X20(onewire.OneWire(INTERNAL_SENSOR_PIN))
     roms_internal = internal_probe.scan()
@@ -38,7 +38,7 @@ def sensor_data_acquisition(shared_mem, mutex):
         return timestamp, internal_reading, external_reading
     except:
         print("Re-initializing Temperature Probes")
-        initiate()
+        initiate_sensors()
     
     
     
