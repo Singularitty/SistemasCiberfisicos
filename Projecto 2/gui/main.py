@@ -10,15 +10,10 @@ def main():
         if event == "Send Values":
             temp = values["-IN_TEMP_VALUE-"]
             temp_int = values["-TEMP_INT-"]
-            to_deliver = temp + ";" + temp_int
-            
+            to_deliver = temp + ";" + temp_int + "\n"
             #my_plot.send_temp_info(to_deliver)
-
             my_plot.update_state(temp, temp_int)
-            
-            # send values throught socket
-            pass
-            
+
 
     my_plot.window.close()
 
