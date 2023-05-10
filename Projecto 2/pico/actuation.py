@@ -34,16 +34,6 @@ class Actuation:
         """
         self.heating.duty_u16(0)
         self.heat_state = 0
-        
-        
-    def __fan_cycle(self):
-        # For testing
-        c = 0
-        for i in range(100):
-            c += 1000000 // 100
-            print(c)
-            self.fan_set(c)
-            time.sleep(0.1)
     
     def fan_off(self):
         """
@@ -75,4 +65,17 @@ class Actuation:
         Return current actuation states
         """
         return self.fan_state, self.heat_state
+
         
+    def __fan_cycle(self):
+        # For testing
+        c = 0
+        for i in range(100):
+            c += 1000000 // 100
+            print(c)
+            self.fan_set(c)
+            time.sleep(0.1)
+            
+    def __get_duty(self):
+        # For debugging
+        return self._fan_duty, self._heat_duty

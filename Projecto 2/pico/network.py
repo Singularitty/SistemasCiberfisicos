@@ -7,12 +7,13 @@ import _thread
 from sensor_data_acquisition import sensor_data_acquisition, initiate_sensors
 # from control import *
 
+# Network Configuration
 DATA_RECORDER_PORT = 4444
 DATA_RECORDER_IP = ''
 CONFIGURATOR_PORT = 5555
 
-ssid = ""
-password = ""
+SSID = ""
+PASSWORD = ""
 
 
 # Global memory for temperatures
@@ -27,7 +28,7 @@ targets_lock = _thread.allocate_lock()
 def connect():
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    wlan.connect(ssid, password)
+    wlan.connect(SSDI, PASSWORD)
     while wlan.isconnected() == False:
         print("Waiting for connection...")
         time.sleep(1)
@@ -45,29 +46,25 @@ def open_socket(ip, port):
     return connection
 
 def receive_targets(connection):
-    state = 0
-    print("here")
+    target_temp = None
+    target_error = None
     while True:
         try:
             client, _ = connection.accept()
             message = client.recv(1024)
-            message = str(message)
+            message = message.decode("utf-8")
             try:
-                new_state = message.split("\\n")[0]
+                data = message.split("\\n")[0]
+                target_temp, target_error = data.split(";")
             except IndexError:
                 pass
-            if new_state == state:
-                print("No change in state")
-            else:
-                print(f"Changed state to {new_state}")
             client.close()
-            break
+            return target_temp, target_error
         except OSError as e:
             if e.args[0] != errno.EAGAIN and e.args[0] != errno.EWOULDBLOCK:
                 raise e
             else:
                 break
-    time.sleep_ms(1000)
 
 def send_data(s, timestamp, internal_temp, external_temp, temp_target, temp_target_error, fan_target, heat_target):
     message = f"{timestamp};{internal_temp};{external_temp};{temp_target};{temp_target_error};{fan_target};{heat_target}\n"
@@ -81,8 +78,8 @@ def main():
     connection = open_socket(ip, CONFIGURATOR_PORT)
 
     # Connect to data recorder
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((DATA_RECORDER_IP, DATA_RECORDER_PORT))
+    data_recorder_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    data_recorder_socket.connect((DATA_RECORDER_IP, DATA_RECORDER_PORT))
     
     # Initiate Temperature Sensors
     initiate_sensors()
@@ -95,18 +92,28 @@ def main():
         # Acquire temperatures
         timestamp, intertal_temp, external_temp = sensor_data_acquisition()
         
+        
+        target_temp = None
+        target_error = None
         # Check for data from the CONFIGURATOR_PORT
         readable, _, _ = select.select([connection], [], [], 0)
         # If there is data, read from socket
         for sock in readable:
             if sock is connection:
-                receive_targets(connection)
+                target_temp, target_error = receive_targets(connection)
 
         # write new targets memory shared with control
         # TODO
         
         # Send data to data recorder
-        send_data(s, 23)
+        send_data(data_recorder_socket,
+                  timestamp,
+                  intertal_temp,
+                  external_temp,
+                  target_temp,
+                  target_error,
+                  0,
+                  0)
         
         time.sleep_ms(1000)
 

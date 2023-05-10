@@ -25,9 +25,9 @@ def initiate_sensors():
     external_probe = ds18x20.DS18X20(onewire.OneWire(EXTERNAL_SENSOR_PIN))
     roms_external = external_probe.scan()
     
-    return interal_probe, roms_internal, external_probe, roms_external
+    return internal_probe, roms_internal, external_probe, roms_external
 
-def sensor_data_acquisition(shared_mem, mutex):
+def sensor_data_acquisition(internal_probe, roms_internal, external_probe, roms_external, shared_mem, mutex):
     try:
         internal_reading = acquire_temperature(internal_probe, roms_internal)
         external_reading = acquire_temperature(external_probe, roms_external)
@@ -38,7 +38,5 @@ def sensor_data_acquisition(shared_mem, mutex):
         return timestamp, internal_reading, external_reading
     except:
         print("Re-initializing Temperature Probes")
-        initiate_sensors()
-    
-    
-    
+        internal_probe, roms_internal, external_probe, roms_external = initiate_sensors()
+        sensor_data_acquisition(internal_probe, roms_internal, external_probe, roms_external, shared_mem, mutex)
