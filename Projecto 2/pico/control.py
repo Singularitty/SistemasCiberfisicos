@@ -1,25 +1,99 @@
 import time
+from actuation import Actuation
 
 class PID:
 
-    def __init__(self, Kp, Ki, Kd, shared_mem_temps, temperatures_lock, shared_mem_targets, targets_lock):
+    def __init__(self, Kp, Ki, Kd):
         
+        # PID 
         self.Kp=Kp
         self.Ki=Ki
         self.Kd=Kd
-        
-        self.shared_mem_targets = shared_mem_targets
-        self.targets_lock = targets_lock
-
-        self.shared_mem_temps = shared_mem_temps
-        self.temperatures_lock = temperatures_lock
 
         self.integral = 0
         self.last_value = 0
         self.last_error = 0
-        self.lastupdate = None
+        self.last_update = time.time()
+        
+    
+    def compute(self, setpoint, value):
+        now = time.time()
+        dt = now - self.last_update
 
-    def control(self):
-        pass
+        # compute error
+        error = setpoint - value
+
+        # compute integral and derivative terms
+        self.integral += error * dt
+        derivative = (error - self.last_error) / dt
+
+        # compute output
+        output = self.Kp * error + self.Ki * self.integral + self.Kd * derivative
+
+        # save state for next iteration
+        self.last_error = error
+        self.last_update = now
+
+        return output
+
+def in_activation_interval(internal, external, target, interval):
+    if not target > external:
+        return False
+    if not (internal < target - interval or internal > target + interval):
+        return False
+    return True
+
+
+def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuations, actuations_lock):
     
+    actuation = Actuation()
     
+    # Adjust the PID values
+    pid_controller = PID(50,10,10)
+    
+    target_temp = None
+    target_interval = None
+
+    current_temp_external = None
+    current_temp_internal = None
+
+    while True:
+        
+        temps_lock.acquire()
+        if shared_temps[0] is not None:
+            _, current_temp_internal, current_temp_external = shared_temps[0]
+            shared_temps[0] = None
+        temps_lock.release()
+        
+        target_lock.acquire()
+        if shared_target[0] is not None:
+            target_temp, target_interval = shared_target[0]
+            shared_target[0] = None
+        target_lock.release()
+        
+        
+        if None not in (target_temp, target_interval, current_temp_external, current_temp_internal):
+            
+            target_temp = float(target_temp)
+            target_interval = float(target_interval)
+            current_temp_external = float(current_temp_external)
+            current_temp_internal = float(current_temp_internal)
+            
+            if in_activation_interval(current_temp_internal, current_temp_external, target_temp, target_interval):
+                output = pid_controller.compute(target_temp, current_temp_internal)
+                output = max(min(output, 100), -100)
+                print(output)
+                if output < 0:
+                    actuation.heating_off()
+                    actuation.fan_set(abs(output))
+                else:
+                    actuation.fan_off()
+                    actuation.heating_set(output)
+        
+        actuations_lock.acquire()
+        shared_actuations[0] = actuation.get_state()
+        actuations_lock.release()
+        
+        print(actuation.get_state())
+        
+        time.sleep_ms(2000)

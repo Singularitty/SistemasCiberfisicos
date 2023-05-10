@@ -3,7 +3,7 @@ import time
 
 class Actuation:
     
-    def __init__(self, heating_pin = 16, heating_freq = 1000, fan_pin = 15, fan_freq = 100000):
+    def __init__(self, heating_pin = 16, heating_freq = 10000, fan_pin = 15, fan_freq = 100000):
         # Define PWM output for PIN Corresponding to the heating element
         self.heating = PWM(Pin(heating_pin, Pin.OUT))
         self.heating.freq(heating_freq)
@@ -46,7 +46,9 @@ class Actuation:
         """
         Set the heating element to the specified target (0-100%)
         """
-        target = percentage * 10
+        target = int(percentage)
+        if target > 90:
+            target = 90
         self.heating.duty_u16(target)
         self.heat_state = percentage
         self._heat_duty = target
@@ -55,17 +57,19 @@ class Actuation:
         """
         Set the heating element to the specified target (unsigned 16 bit int)
         """
-        target = 57500 + percentage * 25 # range de 57500-60000
+        target = 64610 + int(percentage * 3.9) # range de 64610-65000
         self.fan.duty_u16(target)
         self.fan_state = percentage
         self._fan_duty = target
-        
+    
     def get_state(self):
         """
         Return current actuation states
         """
         return self.fan_state, self.heat_state
 
+    def __fan_target(self, target):
+        self.fan.duty_u16(target)
         
     def __fan_cycle(self):
         # For testing

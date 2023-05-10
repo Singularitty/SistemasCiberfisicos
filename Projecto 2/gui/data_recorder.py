@@ -6,7 +6,7 @@ import signal
 from time import sleep
 
 HOST = ''
-PORT = 4443
+PORT = 4444
 
 
 def interrupt_handler(signal, frame):
@@ -31,9 +31,11 @@ def data_acquisition(conn: socket, filename: str):
             for values in data:
                 print(values)
                 try:
+                    print(values)
                     time, temp_in, temp_out, temp_target, temp_interval, fan, heat = values.split(";")
                     inp.write(f"{time},{temp_in},{temp_out},{temp_target},{temp_interval},{fan},{heat}\n")
                 except Exception as err:
+                    raise err
                     print(err)
                     sys.exit(1)
         sleep(2)
@@ -45,7 +47,7 @@ def main():
     try:
         soc.bind((HOST, PORT))
     except socket.error as message:
-        print("Bind failed. Error Code : " + str(message[0]) + " Message " + message[1])
+        print(message)
         sys.exit()
 
     print('Socket binding operation completed')

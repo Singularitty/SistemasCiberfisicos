@@ -9,7 +9,7 @@ import thread
 import socket
 import threading
 
-HOST = ""  # The server's hostname or IP address
+HOST = "192.168.30.219"  # The server's hostname or IP address
 PORT = 5555  # The port used by the server
 
 class Plot():
@@ -47,7 +47,6 @@ class Plot():
         #initialize thread
         self.my_thread = thread.ThreadClass(self.window, fig_canvas)
         self.my_thread.start()
-        #self.soc = self.create_socket(HOST, PORT) #TODO
 
     def create_socket(self, HOST:str, PORT:int) -> socket:
         """
@@ -120,7 +119,10 @@ class Plot():
             Returns:
                 None
         """
-        self.soc.sendall(info)
+        self.soc = self.create_socket(HOST, PORT) #TODO
+        message = bytes(info, "ascii")
+        self.soc.sendall(message)
+        self.soc.close()
 
     def update_state(self, temp:str, temp_int:str) -> None:
         """
@@ -133,7 +135,7 @@ class Plot():
             Returns:
                 None
         """
-        to_state = "Temp: " + temp + "ºC and Interval: " + temp_int + "ºC"
+        to_state = "Temp: " + str(temp) + "ºC and Interval: " + str(temp_int) + "ºC"
         self.window["-C_STATE-"].update(to_state)
         
     def kill_thread(self) -> None:

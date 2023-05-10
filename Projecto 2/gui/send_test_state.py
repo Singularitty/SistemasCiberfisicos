@@ -2,7 +2,7 @@ import socket
 import random
 import time
 
-HOST = "192.168.1.210"  # The server's hostname or IP address
+HOST = "192.168.30.49"  # The server's hostname or IP address
 PORT = 5554 # The port used by the server
 
 def connect_to_server():
@@ -21,7 +21,7 @@ while True:
             state = random.randint(0, 5)
             fan = random.random() * 100
             heat = random.random() * 50
-            message = f"{time.time()};{state}\n"
+            message = f"{23};{1.5}\n"
             print("sending data")
             s.sendall(bytes(message, 'ascii'))
             time.sleep(5)
