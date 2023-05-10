@@ -31,8 +31,8 @@ def data_acquisition(conn: socket, filename: str):
             for values in data:
                 print(values)
                 try:
-                    time, temp_in, temp_out, fan, heat, state = values.split(";")
-                    inp.write(f"{time},{temp_in},{temp_out},{fan},{heat},{state}\n")
+                    time, temp_in, temp_out, temp_target, temp_interval, fan, heat = values.split(";")
+                    inp.write(f"{time},{temp_in},{temp_out},{temp_target},{temp_interval},{fan},{heat}\n")
                 except Exception as err:
                     print(err)
                     sys.exit(1)
@@ -45,9 +45,7 @@ def main():
     try:
         soc.bind((HOST, PORT))
     except socket.error as message:
-        print('Bind failed. Error Code : '
-              + str(message[0]) + ' Message '
-              + message[1])
+        print("Bind failed. Error Code : " + str(message[0]) + " Message " + message[1])
         sys.exit()
 
     print('Socket binding operation completed')
@@ -60,7 +58,7 @@ def main():
     filename = datetime.datetime.now().strftime("%d:%m:%Y_%H:%M:%S")
 
     with open("./data/" + filename + ".csv", "w") as inp:
-        inp.write(f"time,temp_in,temp_out,fan,heat,state\n")
+        inp.write(f"time,temp_in,temp_out,temp_target,temp_interval,fan,heat\n")
 
     print(f"Began data acquisition: {filename}")
 

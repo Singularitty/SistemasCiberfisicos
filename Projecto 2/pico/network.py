@@ -103,7 +103,10 @@ def main():
                 target_temp, target_error = receive_targets(connection)
 
         # write new targets memory shared with control
-        # TODO
+        if target_temp is not None and target_error is not None:
+            targets_lock.acquire()
+            shared_mem_targets.append((target_temp, target_error))
+            targets_lock.release()
         
         # Send data to data recorder
         send_data(data_recorder_socket,
