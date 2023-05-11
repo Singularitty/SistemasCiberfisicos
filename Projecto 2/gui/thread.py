@@ -151,7 +151,7 @@ class ThreadClass(threading.Thread):
             Returns:
             FigureCanvasTkAgg: The updated FigureCanvasTkAgg object.
         """
-        fig:plt.Figure = plt.Figure(figsize=(3, 3), dpi=100)
+        fig:plt.Figure = plt.Figure(figsize=(3, 2), dpi=100)
         fig.add_subplot(111).plot(dataframe.loc[:, "time"], dataframe.loc[:, y_value])
         fig_canva.figure = fig
         fig_canva.draw()
