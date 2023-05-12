@@ -46,12 +46,13 @@ def create_window() -> sg.Window:
 
     # Create the form and show it without the plot
     window = sg.Window(
-        "Matplotlib Single Graph",
+        "Data Visualization Component",
         full_layout,
         location=(0, 0),
         finalize=True,
         element_justification="right",
         font="Helvetica 18",
+        size=(1280,800)
     )
 
     return window

@@ -8,8 +8,8 @@ import select
 import errno
 
 # Define Pin where Internal Temperature sensor is connected
-INTERNAL_SENSOR_PIN = machine.Pin(0, machine.Pin.OUT)
-EXTERNAL_SENSOR_PIN = machine.Pin(17, machine.Pin.OUT)
+INTERNAL_SENSOR_PIN = machine.Pin(20, machine.Pin.OUT)
+EXTERNAL_SENSOR_PIN = machine.Pin(18, machine.Pin.OUT)
 
 def acquire_temperature(ds, roms):
     ds.convert_temp()
@@ -40,4 +40,4 @@ def sensor_data_acquisition(internal_probe, roms_internal, external_probe, roms_
         print("Re-initializing Temperature Probes")
         time.sleep_ms(100)
         internal_probe, roms_internal, external_probe, roms_external = initiate_sensors()
-        sensor_data_acquisition(internal_probe, roms_internal, external_probe, roms_external, shared_mem, mutex)
+        return None

@@ -11,8 +11,8 @@ from control import control
 DATA_RECORDER_PORT = 4444
 DATA_RECORDER_IP = '192.168.30.169'
 CONFIGURATOR_PORT = 5555
-SSID = "picotest"
-PASSWORD = "passwordrandom132"
+SSID = "pico"
+PASSWORD = "random123"
 
 # Global memory for temperatures
 shared_mem_temperatures = [None]
@@ -107,6 +107,10 @@ def main():
                                               roms_external,
                                               shared_mem_temperatures,
                                               temperatures_lock)
+        
+        # Inside temperature probe sometimes returns nothing
+        # Causing the sensor_data_acquisition to reinitiate the probes
+        # In that case we skip that iteration
         if acquisition is not None:
             timestamp, intertal_temp, external_temp = acquisition
 

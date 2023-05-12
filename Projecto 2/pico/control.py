@@ -15,6 +15,8 @@ class PID:
         self.last_error = 0
         self.last_update = time.time()
         
+        self.max_integral = 10
+        
     
     def compute(self, setpoint, value):
         now = time.time()
@@ -25,6 +27,9 @@ class PID:
 
         # compute integral and derivative terms
         self.integral += error * dt
+        if self.integral > self.max_integral:
+            self.integral = self.max_integral
+        
         derivative = (error - self.last_error) / dt
 
         # compute output
@@ -37,8 +42,6 @@ class PID:
         return output
 
 def in_activation_interval(internal, external, target, interval):
-    if not target > external:
-        return False
     if not (internal < target - interval or internal > target + interval):
         return False
     return True
@@ -49,7 +52,7 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
     actuation = Actuation()
     
     # Adjust the PID values
-    pid_controller = PID(50,10,10)
+    pid_controller = PID(34,0.1,18)
     
     target_temp = None
     target_interval = None
@@ -79,9 +82,12 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
             current_temp_external = float(current_temp_external)
             current_temp_internal = float(current_temp_internal)
             
+            if target_temp < current_temp_external:
+                target_temp = current_temp_external
+            
             if in_activation_interval(current_temp_internal, current_temp_external, target_temp, target_interval):
                 output = pid_controller.compute(target_temp, current_temp_internal)
-                output = max(min(output, 100), -100)
+                output = max(min(output, 100), -10)
                 print(output)
                 if output < 0:
                     actuation.heating_off()
@@ -89,6 +95,9 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
                 else:
                     actuation.fan_off()
                     actuation.heating_set(output)
+            else:
+                actuation.fan_off()
+                actuation.heating_off()
         
         actuations_lock.acquire()
         shared_actuations[0] = actuation.get_state()
@@ -97,3 +106,4 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
         print(actuation.get_state())
         
         time.sleep_ms(2000)
+

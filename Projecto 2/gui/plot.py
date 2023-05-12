@@ -44,6 +44,7 @@ class Plot():
         heat_fig_canvas = self.create_figure(self.window["-RES_PLOT-"].TKCanvas)
         fan_fig_canvas = self.create_figure(self.window["-FAN_PLOT-"].TKCanvas)
         fig_canvas = (in_temp_fig_canvas, heat_fig_canvas, fan_fig_canvas)
+        # Maximize
         #initialize thread
         self.my_thread = thread.ThreadClass(self.window, fig_canvas)
         self.my_thread.start()

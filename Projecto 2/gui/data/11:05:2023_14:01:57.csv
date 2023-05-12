@@ -1,0 +1,2 @@
+time,temp_in,temp_out,temp_target,temp_interval,fan,heat
+1683813824,25.0,1060.0,None,None,0,0
