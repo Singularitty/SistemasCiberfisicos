@@ -37,7 +37,7 @@ def create_window() -> sg.Window:
     full_layout = [
         [
             sg.Column(state),
-            sg.Column(temperature_layout),
+            sg.Column(temperature_layout)
         ],[
             sg.Column(resistance_layout),
             sg.Column(fan_layout),
@@ -52,7 +52,7 @@ def create_window() -> sg.Window:
         finalize=True,
         element_justification="right",
         font="Helvetica 18",
-        size=(1280,800)
+        size=(1920,1080)
     )
 
     return window

@@ -1,13 +1,16 @@
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import matplotlib.pyplot as plt
-import threading
-from threading import Lock, Thread
-import PySimpleGUI as sg
-from datetime import datetime
-import pandas as pd
 import os
+import threading
+import matplotlib.pyplot as plt
+import PySimpleGUI as sg
+import pandas as pd
+import numpy as np
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from threading import Lock, Thread
+from datetime import datetime
 from matplotlib import axes
 from time import sleep
+
 
 DATETIME_FORMAT = "%d:%m:%Y_%H:%M:%S"
 
@@ -58,8 +61,8 @@ class ThreadClass(threading.Thread):
             # create dataframe and update plots
             dataframe:pd.DataFrame = pd.read_csv(filepath) 
             temp_fig_canva = self.update_temps_figure(dataframe, temp_fig_canva)
-            heat_fig_canva = self.update_figure(dataframe, "fan", heat_fig_canva)
-            fan_fig_canva = self.update_figure(dataframe, "heat", fan_fig_canva)
+            heat_fig_canva = self.update_figure(dataframe, "heat", heat_fig_canva, 100)
+            fan_fig_canva = self.update_figure(dataframe, "fan", fan_fig_canva, 10)
             sleep(2)
 
     def str_list_to_datetime_list(self, filenames_list:list[str]) -> list[datetime]:
@@ -122,24 +125,30 @@ class ThreadClass(threading.Thread):
             Returns:
             FigureCanvasTkAgg: The updated FigureCanvasTkAgg object.
         """
-        fig:plt.Figure = plt.Figure(figsize=(5, 4), dpi=100)
+        fig:plt.Figure = plt.Figure(figsize=(10, 5), dpi=100, layout="constrained")
         ax:axes.Axes = fig.add_subplot(111)
-        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, "temp_in"], label='in_temp')
-        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, "temp_out"], label='out_temp')
-        temp_target = dataframe["temp_target"].iat[-1]
-        temp_interval = dataframe["temp_interval"].iat[-1]
-        if temp_target != None or temp_interval != None:
-            upper_bound:float = temp_target + temp_interval
-            lower_bound:float = temp_target - temp_interval
-            ax.axhline(y=upper_bound, color='r', linestyle='-')
-            ax.axhline(y=lower_bound, color='r', linestyle='-')
-            ax.legend()
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Temperature (ºC)")
+        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, "temp_in"], label='Interior Temperature')
+        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, "temp_out"], label='Exterior Temperature')
+        dataframe["temp_target"].map(lambda x: np.nan if x is None else x)
+        dataframe["temp_interval"].map(lambda x: np.nan if x is None or x == 0 else x)
+        dataframe["upper_bound"] = dataframe["temp_target"] + dataframe["temp_interval"]
+        dataframe["lower_bound"] = dataframe["temp_target"] - dataframe["temp_interval"]
+        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, "upper_bound"], label='Interval', color="gray")
+        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, "lower_bound"], color="gray")
+        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, "temp_target"], label='Target Temperature', color="black")
+        #    upper_bound:float = temp_target + temp_interval
+        #    lower_bound:float = temp_target - temp_interval
+        #    ax.axhline(y=upper_bound, color='r', linestyle='-')
+        #    ax.axhline(y=lower_bound, color='r', linestyle='-')
+        ax.legend()
         fig_canva.figure = fig
         fig_canva.draw()
         fig_canva.get_tk_widget().pack(side="top", fill="both", expand=1)
         return fig_canva
 
-    def update_figure(self, dataframe:pd.DataFrame, y_value:str, fig_canva:FigureCanvasTkAgg) -> FigureCanvasTkAgg:
+    def update_figure(self, dataframe:pd.DataFrame, y_value:str, fig_canva:FigureCanvasTkAgg, ylimit: int) -> FigureCanvasTkAgg:
         """
             Updates a specific plot (fan or heat) with the latest data from the dataframe.
 
@@ -151,8 +160,15 @@ class ThreadClass(threading.Thread):
             Returns:
             FigureCanvasTkAgg: The updated FigureCanvasTkAgg object.
         """
-        fig:plt.Figure = plt.Figure(figsize=(3, 2), dpi=100)
-        fig.add_subplot(111).plot(dataframe.loc[:, "time"], dataframe.loc[:, y_value])
+        fig:plt.Figure = plt.Figure(figsize=(5, 4), dpi=100, layout="constrained")
+        ax = fig.add_subplot(111)
+        if y_value == "heat":
+            ax.set_ylabel("Actuation %")
+        else:
+            ax.set_ylabel("Actuation % * (10)")
+        ax.set_xlabel("Time (s)")
+        ax.set_ylim(0, ylimit+1)
+        ax.plot(dataframe.loc[:, "time"], dataframe.loc[:, y_value])
         fig_canva.figure = fig
         fig_canva.draw()
         fig_canva.get_tk_widget().pack(side="top", fill="both", expand=1)
