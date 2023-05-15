@@ -16,6 +16,12 @@ def create_window() -> sg.Window:
         ],
         [
             sg.Button("Send Values")
+        ],
+        [
+        sg.Text('Select a file:'), sg.Input(), sg.FileBrowse()
+        ],
+        [
+            sg.Button("View data")
         ]
     ]
 
@@ -33,6 +39,7 @@ def create_window() -> sg.Window:
         [sg.Text("Fan plot")],
         [sg.Canvas(key="-FAN_PLOT-")]
     ]
+    
 
     full_layout = [
         [
@@ -52,7 +59,7 @@ def create_window() -> sg.Window:
         finalize=True,
         element_justification="right",
         font="Helvetica 18",
-        size=(1920,1080)
+        size=(1900,1080)
     )
 
     return window

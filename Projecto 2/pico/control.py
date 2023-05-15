@@ -52,7 +52,7 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
     actuation = Actuation()
     
     # Adjust the PID values
-    pid_controller = PID(34,0.1,18)
+    pid_controller = PID(25,0,18)
     
     target_temp = None
     target_interval = None
