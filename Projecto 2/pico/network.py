@@ -11,7 +11,7 @@ from control import control
 DATA_RECORDER_PORT = 4444
 DATA_RECORDER_IP = '192.168.30.169'
 CONFIGURATOR_PORT = 5555
-SSID = "pico"
+SSID = "pico1"
 PASSWORD = "random123"
 
 # Global memory for temperatures

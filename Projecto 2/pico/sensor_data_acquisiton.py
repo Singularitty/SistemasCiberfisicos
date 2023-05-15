@@ -8,7 +8,7 @@ import select
 import errno
 
 # Define Pin where Internal Temperature sensor is connected
-INTERNAL_SENSOR_PIN = machine.Pin(20, machine.Pin.OUT)
+INTERNAL_SENSOR_PIN = machine.Pin(21, machine.Pin.OUT)
 EXTERNAL_SENSOR_PIN = machine.Pin(18, machine.Pin.OUT)
 
 def acquire_temperature(ds, roms):

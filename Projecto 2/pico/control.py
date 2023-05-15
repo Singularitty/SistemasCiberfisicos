@@ -82,7 +82,7 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
             current_temp_external = float(current_temp_external)
             current_temp_internal = float(current_temp_internal)
             
-            if target_temp < current_temp_external:
+            if target_temp < current_temp_external and current_temp_internal > current_temp_external:
                 target_temp = current_temp_external
             
             if in_activation_interval(current_temp_internal, current_temp_external, target_temp, target_interval):
