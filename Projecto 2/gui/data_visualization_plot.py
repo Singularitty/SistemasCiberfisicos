@@ -1,5 +1,4 @@
-import layout
-import thread
+# System Imports
 import socket
 import threading
 import matplotlib
@@ -10,8 +9,11 @@ import numpy as np
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib import axes
 
-HOST = "192.168.30.219"  # The server's hostname or IP address
-PORT = 5555  # The port used by the server
+# Data Visualization Components
+import data_visualization_layout as layout
+import data_visualization_thread as thread
+
+
 
 class Plot():
     """
@@ -22,8 +24,6 @@ class Plot():
         window (sg.Window): PySimpleGUI window object.
         my_thread (thread.ThreadClass): Custom thread object for updating the plot.
     """
-
-    soc:socket.socket
     window:sg.Window
     my_thread:thread.ThreadClass
 
@@ -49,20 +49,7 @@ class Plot():
         self.my_thread = thread.ThreadClass(self.window, fig_canvas)
         self.my_thread.start()
 
-    def create_socket(self, HOST:str, PORT:int) -> socket:
-        """
-            Creates and connects a socket to a specified host and port.
 
-            Args:
-                HOST (str): The hostname or IP address of the server.
-                PORT (int): The port number.
-
-            Returns:
-                socket: The created socket object.
-        """
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        soc.connect((HOST, PORT))
-        return soc
     
     def create_temps_figure(self, canvas) -> FigureCanvasTkAgg:
         """
@@ -140,21 +127,6 @@ class Plot():
         figure_canvas_agg.draw()
         figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
         return figure_canvas_agg
-    
-    def send_temp_info(self, info:str) -> None:
-        """
-            Sends temperature information to the server.
-
-            Args:
-                info (str): Temperature information to send.
-
-            Returns:
-                None
-        """
-        self.soc = self.create_socket(HOST, PORT) #TODO
-        message = bytes(info, "ascii")
-        self.soc.sendall(message)
-        self.soc.close()
 
     def update_state(self, temp:str, temp_int:str) -> None:
         """
