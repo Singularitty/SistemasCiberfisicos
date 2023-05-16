@@ -39,11 +39,10 @@ class ThreadClass(threading.Thread):
         self.window = window
         self.is_killed = False
         self.fig_canvas = fig_canvas
-
-    def run(self) -> None:
-        """
-            Continuously reads data from CSV files and updates the plots in real-time.
-        """
+        
+        self.data_filepath = self.__determine_most_recent_file()
+        
+    def __determine_most_recent_file(self) -> str:
         # get filenames from ./data/ folder
         filenames_list:list[str] = os.listdir('./data/') 
         # convert list[str] to list[datetime]
@@ -55,11 +54,21 @@ class ThreadClass(threading.Thread):
         # apply filename path
         filepath:str = "./data/" + filename + ".csv"
         
+        return filepath
+    
+    def update_data_filepath(self, filepath: str) -> None:
+        self.data_filepath = filepath
+
+    def run(self) -> None:
+        """
+            Continuously reads data from CSV files and updates the plots in real-time.
+        """
+        
         (temp_fig_canva, heat_fig_canva, fan_fig_canva) = self.fig_canvas
         
         while not self.is_killed:
             # create dataframe and update plots
-            dataframe:pd.DataFrame = pd.read_csv(filepath) 
+            dataframe:pd.DataFrame = pd.read_csv(self.data_filepath) 
             temp_fig_canva = self.update_temps_figure(dataframe, temp_fig_canva)
             heat_fig_canva = self.update_figure(dataframe, "heat", heat_fig_canva, 100)
             fan_fig_canva = self.update_figure(dataframe, "fan", fan_fig_canva, 10)

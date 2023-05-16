@@ -17,8 +17,10 @@ def main():
                 my_plot.send_temp_info(to_deliver)
                 my_plot.update_state(temp, temp_int)
             except Exception as e:
-                print(e)
-
+                sg.popup('Please input integer values')
+        elif event == 'View data':
+            file_path = values[0]  # The file path is in the first element of the values dictionary
+            my_plot.update_file_path(file_path)
 
 
     my_plot.window.close()

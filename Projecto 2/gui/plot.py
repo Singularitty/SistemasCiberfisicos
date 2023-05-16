@@ -170,6 +170,11 @@ class Plot():
         to_state = "Temp: " + str(temp) + "ºC and Interval: " + str(temp_int) + "ºC"
         self.window["-C_STATE-"].update(to_state)
         
+    def update_file_path(self, file_path):
+        self.file_path = file_path
+        self.my_thread.update_data_filepath(file_path)  # Assuming you want to update the plot immediately after a new file is selected
+
+        
     def kill_thread(self) -> None:
         """
             Stops the thread execution.
