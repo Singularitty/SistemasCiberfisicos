@@ -2,6 +2,24 @@ import time
 from actuation import Actuation
 
 class PID:
+    """
+    Proportional-Integral-Derivative (PID) controller implementation.
+
+    Args:
+        Kp (float): Proportional gain.
+        Ki (float): Integral gain.
+        Kd (float): Derivative gain.
+
+    Attributes:
+        Kp (float): Proportional gain.
+        Ki (float): Integral gain.
+        Kd (float): Derivative gain.
+        integral (float): Integral term.
+        last_value (float): Last input value.
+        last_error (float): Last error value.
+        last_update (float): Last update time.
+        max_integral (float): Maximum value for the integral term.
+    """
 
     def __init__(self, Kp, Ki, Kd):
         
@@ -19,6 +37,16 @@ class PID:
         
     
     def compute(self, setpoint, value):
+        """
+        Compute the PID control output based on the setpoint and current value.
+
+        Args:
+            setpoint (float): Desired setpoint value.
+            value (float): Current value.
+
+        Returns:
+            output (float): PID control output.
+        """
         now = time.time()
         dt = now - self.last_update
 
@@ -42,13 +70,38 @@ class PID:
         return output
 
 def in_activation_interval(internal, external, target, interval):
+    """
+    Check if the internal temperature is within the activation interval.
+
+    Args:
+        internal (float): Internal temperature value.
+        external (float): External temperature value.
+        target (float): Target temperature value.
+        interval (float): Activation interval value.
+
+    Returns:
+        in_interval (bool): True if the internal temperature is within the activation interval, False otherwise.
+    """
     if not (internal < target - interval or internal > target + interval):
         return False
     return True
 
 
 def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuations, actuations_lock):
-    
+    """
+    Control function that implements the temperature control logic.
+
+    Args:
+        shared_temps (list): Shared temperatures data structure.
+        temps_lock (threading.Lock): Lock for accessing shared_temps.
+        shared_target (list): Shared target temperature and interval data structure.
+        target_lock (threading.Lock): Lock for accessing shared_target.
+        shared_actuations (list): Shared actuation data structure.
+        actuations_lock (threading.Lock): Lock for accessing shared_actuations.
+
+    Returns:
+        None
+    """
     actuation = Actuation()
     
     # Adjust the PID values

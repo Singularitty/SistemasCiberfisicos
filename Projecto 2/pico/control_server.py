@@ -6,6 +6,18 @@ import machine
 PI_SERVER_PORT = 5555
 
 def open_socket(ip):
+    """
+    Open a socket connection for communication.
+
+    Args:
+        ip (str): IP address of the server.
+
+    Returns:
+        connection (socket.socket): Socket connection object.
+
+    Raises:
+        OSError: If the socket cannot be opened or bound.
+    """
     address = (ip, PI_SERVER_PORT)
     connection = socket.socket()
     connection.bind(address)
@@ -13,6 +25,15 @@ def open_socket(ip):
     return connection
 
 def server(connection):
+    """
+    Start the server to receive messages from clients.
+
+    Args:
+        connection (socket.socket): Socket connection object.
+
+    Returns:
+        None
+    """
     state = 0
     while True:
         print("hello")
@@ -31,5 +52,14 @@ def server(connection):
         time.sleep_ms(1000)
         
 def thread1(ip):
+    """
+    Thread 1 function to open a socket connection and start the server.
+
+    Args:
+        ip (str): IP address of the server.
+
+    Returns:
+        None
+    """
     connection = open_socket(ip)
     server(connection)

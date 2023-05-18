@@ -3,6 +3,15 @@ from data_visualization_plot import Plot
 from configurator import configurator
 
 def data_visualization():
+    """
+    Function to run the data visualization component.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     my_plot = Plot()
     while True:
         event, values = my_plot.window.read()

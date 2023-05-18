@@ -10,10 +10,31 @@ PORT = 4444
 
 
 def interrupt_handler(signal, frame):
+    """
+    Signal handler function for interrupt signal (SIGINT).
+
+    Args:
+        signal: Signal number.
+        frame: Current stack frame.
+
+    Returns:
+        None
+    """
     print("Stopping data acquisition")
     sys.exit(0)
 
+
 def data_acquisition(conn: socket, filename: str):
+    """
+    Function to handle data acquisition from the client and write it to a file.
+
+    Args:
+        conn (socket): Socket object for communication with the client.
+        filename (str): Name of the file to store the data.
+
+    Returns:
+        None
+    """
     buffer = ""
 
     while True:
@@ -40,8 +61,17 @@ def data_acquisition(conn: socket, filename: str):
                     sys.exit(1)
         sleep(2)
 
-def main():
 
+def main():
+    """
+    Main function to start the server and handle client connections.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
@@ -66,8 +96,7 @@ def main():
 
     while True:
         conn, address = soc.accept()
-        print('Connected with ' + address[0] + ':'
-              + str(address[1]))
+        print('Connected with ' + address[0] + ':' + str(address[1]))
 
         try:
             data_acquisition(conn, filename)
@@ -75,6 +104,7 @@ def main():
             print(f"Socket error: {e}, waiting for a new connection...")
         finally:
             conn.close()
+
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, interrupt_handler)

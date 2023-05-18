@@ -28,6 +28,12 @@ actuation_lock = _thread.allocate_lock()
 
 
 def connect():
+    """
+    Connects to a Wi-Fi network using the provided SSID and PASSWORD.
+
+    Returns:
+        str: The IP address assigned to the device.
+    """
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(SSID, PASSWORD)
@@ -39,6 +45,16 @@ def connect():
     return ip
 
 def open_socket(ip, port):
+    """
+    Opens a socket and binds it to the specified IP address and port.
+
+    Args:
+        ip (str): IP address to bind the socket.
+        port (int): Port number to bind the socket.
+
+    Returns:
+        socket.socket: The created and bound socket.
+    """
     address = (ip, port)
     connection = socket.socket()
     connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -48,6 +64,15 @@ def open_socket(ip, port):
     return connection
 
 def receive_targets(connection):
+    """
+    Receives target temperature and error values from the configurator.
+
+    Args:
+        connection (socket.socket): The socket connection with the configurator.
+
+    Returns:
+        tuple: The received target temperature and error values.
+    """
     target_temp = None
     target_error = None
     while True:
@@ -70,10 +95,32 @@ def receive_targets(connection):
                 break
 
 def send_data(s, timestamp, internal_temp, external_temp, temp_target, temp_target_error, fan_target, heat_target):
+    """
+    Sends the data to the data recorder.
+
+    Args:
+        s (socket.socket): The socket connection with the data recorder.
+        timestamp (int): Timestamp of the data.
+        internal_temp (float): Internal temperature value.
+        external_temp (float): External temperature value.
+        temp_target (float): Target temperature value.
+        temp_target_error (float): Target temperature error value.
+        fan_target (int): Fan target value.
+        heat_target (int): Heating target value.
+
+    Returns:
+        None
+    """
     message = f"{timestamp};{internal_temp};{external_temp};{temp_target};{temp_target_error};{fan_target};{heat_target}\n"
     s.sendall(bytes(message, 'ascii'))
 
 def main():
+    """
+    Main function that orchestrates the data recording, temperature sensing, and control processes.
+
+    Returns:
+        None
+    """
 
     ip = connect()
 

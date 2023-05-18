@@ -1,6 +1,15 @@
 import PySimpleGUI as sg
 
 def create_window() -> sg.Window:
+    """
+    Create and return a PySimpleGUI window object.
+
+    Args:
+        None
+
+    Returns:
+        window (sg.Window): PySimpleGUI window object.
+    """
     state = [
         [
             sg.Text("Current State"),

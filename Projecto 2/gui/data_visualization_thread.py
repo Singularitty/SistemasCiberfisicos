@@ -57,6 +57,12 @@ class ThreadClass(threading.Thread):
         return filepath
     
     def update_data_filepath(self, filepath: str) -> None:
+        """
+            Updates the data filepath
+
+            Args:
+            filepath (str): The filepath string
+        """
         self.data_filepath = filepath
 
     def run(self) -> None:
