@@ -60,7 +60,7 @@ def open_socket(ip, port):
     connection.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     connection.bind(address)
     connection.listen(1)
-    connection.setblocking(True)  # Set the socket to non-blocking mode
+    connection.setblocking(True)  # Set the socket to blocking mode
     return connection
 
 def receive_targets(connection):
@@ -171,12 +171,13 @@ def main():
                         target_temp = temp
                         target_error = interval
 
-            # write new targets memory shared with control
+            # write new targets in memory shared with control thread
             if target_temp is not None and target_error is not None:
                 targets_lock.acquire()
                 shared_mem_targets[0] = (target_temp, target_error)
                 targets_lock.release()
         
+            # Get current actuation states from shared memory
             actuation_lock.acquire()
             if shared_actuation_state[0] is not None:
                 fan_target, heat_target = shared_actuation_state[0]
@@ -193,8 +194,6 @@ def main():
                       target_error,
                       fan_target,
                       heat_target)
-        
-        #send_data(data_recorder_socket, 1, 1, 1, target_temp, target_error, 0, 0)
         
         time.sleep_ms(1000)
 

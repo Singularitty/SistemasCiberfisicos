@@ -102,6 +102,7 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
     Returns:
         None
     """
+    # Initiate actuation elements
     actuation = Actuation()
     
     # Adjust the PID values
@@ -135,8 +136,14 @@ def control(shared_temps, temps_lock, shared_target, target_lock, shared_actuati
             current_temp_external = float(current_temp_external)
             current_temp_internal = float(current_temp_internal)
             
+            # System cannot cool itself lower than the external temperature and can only set targets
+            # lower than the external temperature if internal tempreture is lower than the external one
             if target_temp < current_temp_external and current_temp_internal > current_temp_external:
                 target_temp = current_temp_external
+                
+            # Don't allow target temperature to exceed 40ºC
+            if target_temp > 40.0:
+                target_temp = 40.0
             
             if in_activation_interval(current_temp_internal, current_temp_external, target_temp, target_interval):
                 output = pid_controller.compute(target_temp, current_temp_internal)

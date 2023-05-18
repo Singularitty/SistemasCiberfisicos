@@ -19,7 +19,7 @@ class Actuation:
         self.fan_state = 0
         self.heat_state = 0
         
-        # Actual Duty value
+        # Actual Duty value (for debugging)
         self._fan_duty = 0
         self._heat_duty = 0
 
@@ -55,9 +55,9 @@ class Actuation:
     
     def fan_set(self, percentage):
         """
-        Set the heating element to the specified target (unsigned 16 bit int)
+        Set the heating element to the specified target (0-10)
         """
-        target = 64700 + int(percentage * 30) # range de 64610-65000
+        target = 64700 + int(percentage * 30) # range de 64700-65000
         self.fan.duty_u16(target)
         self.fan_state = percentage
         self._fan_duty = target
@@ -67,20 +67,4 @@ class Actuation:
         Return current actuation states
         """
         return self.fan_state, self.heat_state
-
-    def __fan_target(self, target):
-        self.fan.duty_u16(target)
-        
-    def __fan_cycle(self):
-        # For testing
-        c = 0
-        for i in range(100):
-            c += 1000000 // 100
-            print(c)
-            self.fan_set(c)
-            time.sleep(0.1)
-            
-    def __get_duty(self):
-        # For debugging
-        return self._fan_duty, self._heat_duty
 
